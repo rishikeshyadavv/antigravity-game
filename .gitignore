@@ -1,0 +1,7 @@
+# Compiled binaries
+*.exe
+*.o
+*.obj
+
+# Raylib library (downloaded dependency)
+raylib/
