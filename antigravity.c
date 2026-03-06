@@ -85,8 +85,10 @@ static void UpdateDrawParticles(float dt)
             particles[i].life -= dt;
             particles[i].x    += particles[i].vx * dt;
             particles[i].y    += particles[i].vy * dt;
-            unsigned char alpha = (unsigned char)(255.0f * (particles[i].life / 0.55f));
-            if (alpha > 255) alpha = 255;
+            float rawAlpha = 255.0f * (particles[i].life / 0.55f);
+            if (rawAlpha > 255.0f) rawAlpha = 255.0f;
+            if (rawAlpha < 0.0f)   rawAlpha = 0.0f;
+            unsigned char alpha = (unsigned char)rawAlpha;
             Color c = particles[i].col;
             c.a = alpha;
             DrawCircle((int)particles[i].x, (int)particles[i].y, 2.0f, c);
@@ -121,7 +123,9 @@ static void SpawnObstacle(void)
             obstacles[i].width  = 40.0f;
 
             float margin = OBSTACLE_GAP / 2.0f + 30.0f;
-            obstacles[i].gapY = margin + (float)(rand() % (int)(SCREEN_H - 2 * margin));
+            int range = (int)(SCREEN_H - 2 * margin);
+            if (range <= 0) range = 1;   /* safety: prevent UB from rand() % 0 */
+            obstacles[i].gapY = margin + (float)(rand() % range);
             return;
         }
     }
@@ -320,7 +324,7 @@ int main(void)
             Vector2 triA = { PLAYER_X,          playerY + dir * (PLAYER_RADIUS + 6) };
             Vector2 triB = { PLAYER_X - 5.0f,   playerY + dir * (PLAYER_RADIUS - 2) };
             Vector2 triC = { PLAYER_X + 5.0f,   playerY + dir * (PLAYER_RADIUS - 2) };
-            DrawTriangle(triA, triB, triC, core);
+            DrawTriangle(triA, triC, triB, core);  /* CCW winding for Raylib */
         }
 
         /* particles */
