@@ -52,4 +52,7 @@ jobs:
         run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
 
       - name: Deploy to Vercel
-        run: vercel deploy --prod --token=${{ secrets.VERCEL_TOKEN }}
+        run: |
+          cp vercel.json web/vercel.json
+          cd web
+          vercel deploy --prod --yes --token=${{ secrets.VERCEL_TOKEN }}
