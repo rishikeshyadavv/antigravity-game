@@ -27,9 +27,17 @@ jobs:
       - name: Create output directory
         run: mkdir -p web
 
+      - name: Download Raylib WebAssembly
+        run: |
+          wget https://github.com/raysan5/raylib/releases/download/5.5/raylib-5.5_webassembly.zip
+          unzip raylib-5.5_webassembly.zip
+
       - name: Build WASM
         run: |
           emcc antigravity_web.c -o web/index.html \
+            -I raylib-5.5_webassembly/include \
+            -L raylib-5.5_webassembly/lib \
+            -lraylib \
             -Os -Wall \
             -DPLATFORM_WEB \
             -s USE_GLFW=3 \
