@@ -1,0 +1,55 @@
+name: Build & Deploy to Vercel
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+env:
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Emscripten
+        uses: mymindstorm/setup-emsdk@v14
+        with:
+          version: 3.1.51
+
+      - name: Verify Emscripten
+        run: emcc --version
+
+      - name: Create output directory
+        run: mkdir -p web
+
+      - name: Build WASM
+        run: |
+          emcc antigravity_web.c -o web/index.html \
+            -Os -Wall \
+            -DPLATFORM_WEB \
+            -s USE_GLFW=3 \
+            -s ASYNCIFY \
+            -s TOTAL_MEMORY=67108864 \
+            -s ALLOW_MEMORY_GROWTH=1 \
+            --shell-file web/shell.html
+
+      - name: Verify build output
+        run: |
+          echo "Build output:"
+          ls -lh web/
+          echo "WASM file size:"
+          ls -lh web/index.wasm
+
+      - name: Install Vercel CLI
+        run: npm install -g vercel@latest
+
+      - name: Pull Vercel Environment
+        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Deploy to Vercel
+        run: vercel deploy --prod --token=${{ secrets.VERCEL_TOKEN }}
