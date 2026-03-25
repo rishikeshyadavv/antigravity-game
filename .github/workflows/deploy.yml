@@ -19,7 +19,7 @@ jobs:
       - name: Setup Emscripten
         uses: mymindstorm/setup-emsdk@v14
         with:
-          version: 3.1.51
+          version: latest
 
       - name: Verify Emscripten
         run: emcc --version
@@ -27,22 +27,23 @@ jobs:
       - name: Create output directory
         run: mkdir -p web
 
-      - name: Download Raylib WebAssembly
+      - name: Clone and Build Raylib
         run: |
-          wget https://github.com/raysan5/raylib/releases/download/5.5/raylib-5.5_webassembly.zip
-          unzip raylib-5.5_webassembly.zip
+          git clone --depth 1 --branch 5.5 https://github.com/raysan5/raylib.git raylib-src
+          cd raylib-src/src
+          make PLATFORM=PLATFORM_WEB -B
 
       - name: Build WASM
         run: |
           emcc antigravity_web.c -o web/index.html \
-            -I raylib-5.5_webassembly/include \
-            -L raylib-5.5_webassembly/lib \
+            -I raylib-src/src \
+            -L raylib-src/src \
             -lraylib \
             -Os -Wall \
             -DPLATFORM_WEB \
             -s USE_GLFW=3 \
             -s ASYNCIFY \
-            -s TOTAL_MEMORY=67108864 \
+            -s INITIAL_MEMORY=67108864 \
             -s ALLOW_MEMORY_GROWTH=1 \
             --shell-file web/shell.html
 
