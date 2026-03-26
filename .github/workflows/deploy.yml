@@ -44,14 +44,8 @@ jobs:
             -s ALLOW_MEMORY_GROWTH=1 \
             --shell-file web/shell.html
 
-      - name: Install Vercel CLI
-        run: npm install -g vercel@latest
-
-      - name: Pull Vercel Environment
-        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
-
-      - name: Deploy to Vercel
-        run: |
-          cp vercel.json web/vercel.json
-          cd web
-          vercel deploy --prod --yes --token=${{ secrets.VERCEL_TOKEN }}
+      - name: Upload Build Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: antigravity-web-build
+          path: web/
