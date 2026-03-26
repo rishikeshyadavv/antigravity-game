@@ -15,6 +15,12 @@
 
 **Antigravity** is a fast-paced arcade game where the player controls a glowing orb navigating through an endless field of obstacles. The core mechanic is simple yet addictive — **hold SPACE to flip gravity upward**, release to fall back down. Dodge green pillars, rack up your score, and try to beat your high score!
 
+## 🎮 Play Online
+
+🚀 **[Play the game directly in your browser here!](https://tempantigravitydeploy.vercel.app)** 🚀
+
+*(Web version supports both Keyboard and Touch/Click inputs!)*
+
 ## ✨ Features
 
 - **Gravity-flip mechanic** — Hold SPACE to defy gravity; release to fall
