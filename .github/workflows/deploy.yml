@@ -5,6 +5,10 @@ on:
     branches: [main, master]
   workflow_dispatch:
 
+env:
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
 jobs:
   build-wasm:
     runs-on: ubuntu-latest
@@ -40,8 +44,14 @@ jobs:
             -s ALLOW_MEMORY_GROWTH=1 \
             --shell-file web/shell.html
 
-      - name: Upload Build Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: antigravity-web-build
-          path: web/
+      - name: Install Vercel CLI
+        run: npm install -g vercel@latest
+
+      - name: Pull Vercel Environment
+        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Deploy to Vercel
+        run: |
+          cp vercel.json web/vercel.json
+          cd web
+          vercel deploy --prod --yes --token=${{ secrets.VERCEL_TOKEN }}
