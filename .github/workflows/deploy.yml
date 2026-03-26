@@ -44,8 +44,13 @@ jobs:
             -s ALLOW_MEMORY_GROWTH=1 \
             --shell-file web/shell.html
 
-      - name: Upload Build Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: antigravity-web-build
-          path: web/
+      - name: Deploy to gh-pages branch
+        run: |
+          cd web
+          git init
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b gh-pages
+          git add .
+          git commit -m "Deploy WebAssembly build"
+          git push --force "https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" gh-pages
